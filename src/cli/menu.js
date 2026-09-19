@@ -19,6 +19,11 @@ export async function showMenu() {
             message: "Select an option:",
             choices: [
                 "Register Complaint",
+                "Analyze Complaint",
+                "View Complaint",
+                "Track Complaint",
+                "Update Complaint Status",
+                "Status History",
                 "System Information",
                 "Exit"
             ]
@@ -26,4 +31,4 @@ export async function showMenu() {
     ]);
 
     return answer.choice;
-}
+} 

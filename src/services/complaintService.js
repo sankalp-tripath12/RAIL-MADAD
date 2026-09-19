@@ -1,5 +1,6 @@
 import db from "../database/database.js";
 import { generateComplaintId } from "../utils/helpers.js";
+import { classifyComplaint } from "../ai/classifier.js";
 
 export function registerComplaint(complaintData) {
     const complaintId = generateComplaintId();
@@ -86,4 +87,107 @@ export function registerComplaint(complaintData) {
     });
 
     return complaintId;
+}
+
+export function getComplaintById(complaintId) {
+    return db.prepare(`
+        SELECT *
+        FROM complaints
+        WHERE complaint_id = ?
+    `).get(complaintId);
+}
+
+export function getComplaintHistory(complaintId) {
+    return db.prepare(`
+        SELECT *
+        FROM status_history
+        WHERE complaint_id = ?
+        ORDER BY timestamp ASC
+    `).all(complaintId);
+}
+
+export function updateComplaintStatus(
+    complaintId,
+    newStatus,
+    remarks = "Status updated",
+    updatedBy = "CLI"
+) {
+    const complaint = getComplaintById(complaintId);
+
+    if (!complaint) {
+        return null;
+    }
+
+    const now = new Date().toISOString();
+
+    db.prepare(`
+        UPDATE complaints
+        SET
+            status = ?,
+            official_remarks = ?,
+            updated_at = ?,
+            resolved_at = CASE
+                WHEN ? = 'RESOLVED' THEN ?
+                ELSE resolved_at
+            END
+        WHERE complaint_id = ?
+    `).run(
+        newStatus,
+        remarks,
+        now,
+        newStatus,
+        now,
+        complaintId
+    );
+
+    db.prepare(`
+        INSERT INTO status_history (
+            complaint_id,
+            old_status,
+            new_status,
+            remarks,
+            updated_by,
+            timestamp
+        )
+        VALUES (?, ?, ?, ?, ?, ?)
+    `).run(
+        complaintId,
+        complaint.status,
+        newStatus,
+        remarks,
+        updatedBy,
+        now
+    );
+
+    return getComplaintById(complaintId);
+}
+
+export function analyzeComplaintCategory(complaintId) {
+    const complaint = getComplaintById(complaintId);
+
+    if (!complaint) {
+        return null;
+    }
+
+    const result = classifyComplaint(complaint.description);
+
+    db.prepare(`
+        UPDATE complaints
+        SET
+            category = ?,
+            confidence = ?,
+            updated_at = ?
+        WHERE complaint_id = ?
+    `).run(
+        result.category,
+        result.confidence,
+        new Date().toISOString(),
+        complaintId
+    );
+
+    return {
+        complaintId: complaintId,
+        category: result.category,
+        confidence: result.confidence
+    };
 }

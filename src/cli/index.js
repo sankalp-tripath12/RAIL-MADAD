@@ -1,6 +1,14 @@
 import initializeDatabase from "../database/schema.js";
+
 import { showMenu } from "./menu.js";
-import { handleRegisterComplaint } from "./commands.js";
+
+import {
+    handleRegisterComplaint,
+    handleViewComplaint,
+    handleTrackComplaint,
+    handleUpdateComplaintStatus,
+    handleStatusHistory
+} from "./commands.js";
 
 async function startApplication() {
     console.clear();
@@ -26,6 +34,22 @@ async function startApplication() {
                     await handleRegisterComplaint();
                     break;
 
+                case "View Complaint":
+                    await handleViewComplaint();
+                    break;
+
+                case "Track Complaint":
+                    await handleTrackComplaint();
+                    break;
+
+                case "Update Complaint Status":
+                    await handleUpdateComplaintStatus();
+                    break;
+
+                case "Status History":
+                    await handleStatusHistory();
+                    break;
+
                 case "System Information":
                     console.log("\n");
                     console.log("========================================================");
@@ -48,6 +72,7 @@ async function startApplication() {
         }
 
         console.log("\n✓ Rail Madad AI closed successfully.");
+
     } catch (error) {
         console.error("\n❌ Application failed to start.");
         console.error(error.message);
