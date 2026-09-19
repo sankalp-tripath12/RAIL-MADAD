@@ -89,6 +89,7 @@ export function registerComplaint(complaintData) {
     return complaintId;
 }
 
+
 export function getComplaintById(complaintId) {
     return db.prepare(`
         SELECT *
@@ -96,6 +97,7 @@ export function getComplaintById(complaintId) {
         WHERE complaint_id = ?
     `).get(complaintId);
 }
+
 
 export function getComplaintHistory(complaintId) {
     return db.prepare(`
@@ -105,6 +107,7 @@ export function getComplaintHistory(complaintId) {
         ORDER BY timestamp ASC
     `).all(complaintId);
 }
+
 
 export function updateComplaintStatus(
     complaintId,
@@ -161,6 +164,7 @@ export function updateComplaintStatus(
 
     return getComplaintById(complaintId);
 }
+
 
 export function analyzeComplaintCategory(complaintId) {
     const complaint = getComplaintById(complaintId);

@@ -1,83 +1,62 @@
-import initializeDatabase from "../database/schema.js";
-
 import { showMenu } from "./menu.js";
 
 import {
     handleRegisterComplaint,
+    handleAnalyzeComplaint,
     handleViewComplaint,
     handleTrackComplaint,
     handleUpdateComplaintStatus,
-    handleStatusHistory
+    handleStatusHistory,
+    handleSystemInformation
 } from "./commands.js";
 
-async function startApplication() {
-    console.clear();
 
-    console.log("========================================================");
-    console.log("              🚆 RAIL MADAD AI");
-    console.log("       AI Complaint Management System");
-    console.log("========================================================");
+async function startCLI() {
+    let running = true;
 
-    try {
-        initializeDatabase();
+    while (running) {
+        const choice = await showMenu();
 
-        console.log("✓ Database Connected");
-        console.log("✓ Database Initialized");
+        switch (choice) {
 
-        let running = true;
+            case "Register Complaint":
+                await handleRegisterComplaint();
+                break;
 
-        while (running) {
-            const choice = await showMenu();
+            case "Analyze Complaint":
+                await handleAnalyzeComplaint();
+                break;
 
-            switch (choice) {
-                case "Register Complaint":
-                    await handleRegisterComplaint();
-                    break;
+            case "View Complaint":
+                await handleViewComplaint();
+                break;
 
-                case "View Complaint":
-                    await handleViewComplaint();
-                    break;
+            case "Track Complaint":
+                await handleTrackComplaint();
+                break;
 
-                case "Track Complaint":
-                    await handleTrackComplaint();
-                    break;
+            case "Update Complaint Status":
+                await handleUpdateComplaintStatus();
+                break;
 
-                case "Update Complaint Status":
-                    await handleUpdateComplaintStatus();
-                    break;
+            case "Status History":
+                await handleStatusHistory();
+                break;
 
-                case "Status History":
-                    await handleStatusHistory();
-                    break;
+            case "System Information":
+                await handleSystemInformation();
+                break;
 
-                case "System Information":
-                    console.log("\n");
-                    console.log("========================================================");
-                    console.log("                 SYSTEM INFORMATION");
-                    console.log("========================================================");
-                    console.log("Project      : Rail Madad AI");
-                    console.log("Version      : 1.0.0");
-                    console.log("Runtime      : Node.js");
-                    console.log("Database     : SQLite");
-                    console.log("Interface    : CLI");
-                    console.log("Architecture : Node.js + SQLite");
-                    console.log("Status       : Running");
-                    console.log("========================================================");
-                    break;
+            case "Exit":
+                console.log("\n🚆 Thank you for using Rail Madad AI.");
+                console.log("Exiting system...\n");
+                running = false;
+                break;
 
-                case "Exit":
-                    running = false;
-                    break;
-            }
+            default:
+                console.log("\n❌ Invalid option.");
         }
-
-        console.log("\n✓ Rail Madad AI closed successfully.");
-
-    } catch (error) {
-        console.error("\n❌ Application failed to start.");
-        console.error(error.message);
-        process.exit(1);
     }
 }
 
-startApplication();
+startCLI();
