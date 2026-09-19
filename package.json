@@ -1,0 +1,28 @@
+{
+  "name": "rail-madad-ai",
+  "version": "1.0.0",
+  "description": "AI-powered Rail Madad complaint management system",
+  "main": "src/cli/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/cli/index.js",
+    "cli": "node src/cli/index.js",
+    "server": "node src/server/server.js",
+    "frontend": "npm run dev --prefix frontend"
+  },
+  "keywords": [
+    "rail-madad",
+    "complaint-management",
+    "ai",
+    "nodejs",
+    "sqlite",
+    "cli"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "better-sqlite3": "^12.0.0",
+    "chalk": "^5.0.0",
+    "inquirer": "^12.0.0"
+  }
+}
