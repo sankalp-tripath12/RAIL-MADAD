@@ -1,6 +1,9 @@
 import db from "../database/database.js";
 import { generateComplaintId } from "../utils/helpers.js";
 import { classifyComplaint } from "../ai/classifier.js";
+import { detectPriority } from "../ai/priority.js";
+import { analyzeSentiment } from "../ai/sentiment.js";
+import { routeComplaint } from "../ai/router.js";
 
 export function registerComplaint(complaintData) {
     const complaintId = generateComplaintId();
@@ -174,17 +177,26 @@ export function analyzeComplaintCategory(complaintId) {
     }
 
     const result = classifyComplaint(complaint.description);
+    const priorityResult = detectPriority(complaint.description);
+    const sentimentResult = analyzeSentiment(complaint.description);
+    const routingResult = routeComplaint(result.category);
 
     db.prepare(`
         UPDATE complaints
         SET
             category = ?,
             confidence = ?,
+            priority = ?,
+            sentiment = ?,
+            department = ?,
             updated_at = ?
         WHERE complaint_id = ?
     `).run(
         result.category,
         result.confidence,
+        priorityResult.priority,
+        sentimentResult.sentiment,
+        routingResult.department,
         new Date().toISOString(),
         complaintId
     );
@@ -192,6 +204,9 @@ export function analyzeComplaintCategory(complaintId) {
     return {
         complaintId: complaintId,
         category: result.category,
-        confidence: result.confidence
+        confidence: result.confidence,
+        priority: priorityResult.priority,
+        sentiment: sentimentResult.sentiment,
+        department: routingResult.department
     };
 }

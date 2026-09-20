@@ -10,7 +10,6 @@ import {
     handleSystemInformation
 } from "./commands.js";
 
-
 async function startCLI() {
     let running = true;
 
@@ -18,7 +17,6 @@ async function startCLI() {
         const choice = await showMenu();
 
         switch (choice) {
-
             case "Register Complaint":
                 await handleRegisterComplaint();
                 break;
